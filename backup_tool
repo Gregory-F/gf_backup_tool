@@ -1,0 +1,86 @@
+#!/bin/sh
+
+#creates few variables.
+#the first 5 are used to name folders.
+#the last one is the path to an exclude file.
+SRC=/
+SNAP=/snapshots
+FORMAT="%Y-%m-%d-%H-%M"
+TODAY=$(date +$FORMAT)
+YESTERDAY=$(ls $SNAP | tail -1)
+EXCLUDE=/home/greg/documents/exclude_file
+#({"/proc/", "/dev/", "/run/", "/srv/", "/sys/", "/tmp/", "/mnt/", "/home/", "/snapshots/", "/var/", "/media/"})
+
+remove () {
+	# this function checks if there are too many backups
+	#too many means more than 7.
+	#if so then it delets the oldest one.
+	COUNT=$(ls $SNAP | wc -l)
+	if [ $COUNT -gt 7 ];
+	then
+	    DELETE=$SNAP/$(ls $SNAP | head -1)
+	    rm -rf $DELETE
+	fi
+
+}
+
+check () {
+    #this function is made to check if we need to make a new backup.
+    #First it checks if $YESDERDAY is not empty.
+    #it will be at the first usage.
+    #if it is not, then we check if yeasterday and today are at least 1 day apart.
+    #if they are we copy as links $YESTERDAY into $TODAY, both inside the $SNAP folder.
+    #at this point we call both create() and remove() functions.
+    #if $YESTERDAY variable is empty (the else part) then we simply call create() function.
+
+    if [ ! -z "$YESTERDAY" ];
+    then
+	if [ $(datediff -i $FORMAT $YESTERDAY $TODAY -f "%d") -ge 1 ];
+	then
+	    cp -al $SNAP/$YESTERDAY $SNAP/$TODAY
+	    create
+	    remove
+	fi
+    else
+	create
+    fi
+
+}
+
+create () {
+    #this function makes the snapshot.
+    #to do so it uses rsync with the exclude list.
+    #if it a single line function is to give the user possibility to...
+    #... enter the function as parameter to the scritp.
+    rsync -razP --delete --exclude-from=$EXCLUDE $SRC $SNAP/$TODAY
+
+}
+
+list () {
+    for ((num=1; num<=$(ls $SNAP | wc -l); num++))
+    do
+	echo "$num - $(ls -r $SNAP -1 | head -$num | tail -1)"
+    done
+}
+
+help () {
+echo "$1
+
+	--help -h) Displays this message.
+	--list) displays the full snapshots list
+	--check) checks if you nedd to do a new snapshots according to your preferences
+	--create) will create a new snapshot.
+
+	"
+
+}
+
+case $@ in
+    --help|-h) help "  This is the Backup_tool Help";;
+    --list) list;;
+    --check) check;;
+    --create) create;;
+    *) help "Error: Invalid Argument $1 Valid Arguments are:";;
+esac
+
+exit
