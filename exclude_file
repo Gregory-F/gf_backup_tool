@@ -1,0 +1,11 @@
+/proc/*
+/dev/*
+/run/*
+/srv/*
+/sys/*
+/tmp/*
+/mnt/*
+/home/*
+/snapshots/*
+/var/*
+/media/*
