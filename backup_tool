@@ -7,6 +7,7 @@ SRC=/
 SNAP=/snapshots
 FORMAT="%Y-%m-%d-%H-%M"
 TODAY=$(date +$FORMAT)
+DIR_ARRAY={Dailly,Mounthly,Weekly}
 YESTERDAY=$(ls $SNAP | tail -1)
 EXCLUDE=/home/greg/documents/exclude_file
 #({"/proc/", "/dev/", "/run/", "/srv/", "/sys/", "/tmp/", "/mnt/", "/home/", "/snapshots/", "/var/", "/media/"})
@@ -57,10 +58,46 @@ create () {
 }
 
 list () {
-    for ((num=1; num<=$(ls $SNAP | wc -l); num++))
+    #This function is made to display the snapshots list.
+
+    #first thing first: we empty the global associative array
+    arrVar=()
+
+    #first we fetch each one of the directorie present into $SNAP
+    for directory in $SNAP/{Mounthly,Weekly,Dailly}
     do
-	echo "$num - $(ls -r $SNAP -1 | head -$num | tail -1)"
+	declare -a tmparr=() #creates or empty the tmp array.
+	#because the array is empty in the loop it will be fresh for each directory.
+	for content in $(ls $directory)
+	do
+	    #add the content of ls directory into the temp array
+	    tmparr+=($content)
+	done
+	#here we add to our global arrVar.
+	#as key the directory first leter (D,W,M)
+	#as key the temporary array.
+	arrVar+=(["${i:10:1}"]="${tmparr[@]}")
     done
+    rm /tmp/temp*
+    num=1 #needed to show line number.
+    for key in "${!arrVar[@]}" #we loop our array by keys this why there is a !
+    do
+	for val in ${arrVar[$key]} #here we loop each of the array value.
+	do
+	    #we store each line at the end of a temporary file.
+	    $(echo "$val $key" >> /tmp/temp.txt)
+	done
+    done
+    #we need to sort the temporary file.
+    sort -r /tmp/temp.txt >> /tmp/temp1.txt
+    cat /tmp/temp1.txt | while read line; do
+    #now show each line of the sorted tmp file.
+    #but we add a line number. the $num.
+    echo "$num $line"
+    #increment $num.
+    ((num=num+1))
+done
+
 }
 
 help () {
@@ -80,7 +117,7 @@ case $@ in
     --list) list;;
     --check) check;;
     --create) create;;
-    *) help "Error: Invalid Argument $1 Valid Arguments are:";;
+    *) help "Error: Invalid Argument '$1' Valid Arguments are:";;
 esac
 
 exit
