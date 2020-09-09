@@ -10,6 +10,7 @@ TODAY=$(date +$FORMAT)
 DIR_ARRAY={Dailly,Mounthly,Weekly}
 YESTERDAY=$(ls $SNAP | tail -1)
 EXCLUDE=/home/greg/documents/exclude_file
+touch /tmp/temp.txt
 #({"/proc/", "/dev/", "/run/", "/srv/", "/sys/", "/tmp/", "/mnt/", "/home/", "/snapshots/", "/var/", "/media/"})
 
 remove () {
@@ -60,23 +61,22 @@ create () {
 list () {
     #This function is made to display the snapshots list.
 
-    #first thing first: we empty the global associative array
-    arrVar=()
+    declare -A arrVar=()
 
     #first we fetch each one of the directorie present into $SNAP
     for directory in $SNAP/{Mounthly,Weekly,Dailly}
     do
 	declare -a tmparr=() #creates or empty the tmp array.
-	#because the array is empty in the loop it will be fresh for each directory.
+	#because we empty the array inside the loop it will be fresh for each directory.
 	for content in $(ls $directory)
 	do
 	    #add the content of ls directory into the temp array
 	    tmparr+=($content)
 	done
-	#here we add to our global arrVar.
+	#here we add to our arrVar.
 	#as key the directory first leter (D,W,M)
 	#as key the temporary array.
-	arrVar+=(["${i:10:1}"]="${tmparr[@]}")
+	arrVar+=(["${directory:11:1}"]="${tmparr[@]}")
     done
     rm /tmp/temp*
     num=1 #needed to show line number.
