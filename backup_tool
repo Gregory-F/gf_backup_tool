@@ -1,29 +1,33 @@
 #!/bin/sh
 
-#creates few variables.
-#the first 5 are used to name folders.
-#the last one is the path to an exclude file.
+#here we create some constants.
 SRC=/
 SNAP=/snapshots
 FORMAT="%Y-%m-%d-%H-%M"
 TODAY=$(date +$FORMAT)
-DIR_ARRAY={Dailly,Mounthly,Weekly}
-YESTERDAY=$(ls $SNAP | tail -1)
-EXCLUDE=/home/greg/documents/exclude_file
-touch /tmp/temp.txt
-#({"/proc/", "/dev/", "/run/", "/srv/", "/sys/", "/tmp/", "/mnt/", "/home/", "/snapshots/", "/var/", "/media/"})
+EXCLUDE=/etc/gf_backup_tool/exclude
+CONFIG=/etc/gf_backup_tool/config
+CONFIG_ARRAY=(Dailly Weekly Mounthly Hourly)
+touch /tmp/temp.txt #need to create it otherwise check() gonna complain.
 
 remove () {
-	# this function checks if there are too many backups
-	#too many means more than 7.
-	#if so then it delets the oldest one.
-	COUNT=$(ls $SNAP | wc -l)
-	if [ $COUNT -gt 7 ];
-	then
-	    DELETE=$SNAP/$(ls $SNAP | head -1)
+    #function made to remove exciding backups.
+    #it will check in each folder (dailly hourly etc) if we excede the max amount.
+    #the amount is in the config file stored in $CONFIG. (constante declared on top)
+    #we gonna loop the CONFIG_ARRAY with the folders names (constante declared on top)
+    for var in ${CONFIG_ARRAY[@]}
+    do
+	LIMITE=$(grep $var $CONFIG | sed 's/.*=//')
+	FOLDER=$(grep $var $CONFIG | sed 's/=.*//')
+	DIRECTORY=$SNAP/$FOLDER
+	COUNT=$(ls $DIRECTORY | wc -l)
+	while [ $COUNT -gt $LIMITE ]
+	do
+	    DELETE=$DIRECTORY/$(ls $DIRECTORY | head -1)
 	    rm -rf $DELETE
-	fi
-
+	    COUNT=$(ls $DIRECTORY | wc -l)
+	done
+    done
 }
 
 check () {
