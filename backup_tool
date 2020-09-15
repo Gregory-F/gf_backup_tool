@@ -7,20 +7,16 @@ FORMAT="%Y-%m-%d-%H-%M"
 TODAY=$(date +$FORMAT)
 EXCLUDE=/etc/gf_backup_tool/exclude
 CONFIG=/etc/gf_backup_tool/config
-CONFIG_ARRAY=(Dailly Weekly Mounthly Hourly)
+declare -A CONFIG_ARRAY=([Dailly]="%d" [Weekly]="%w" [Mounthly]="%m" [Hourly]="%H")
 touch /tmp/temp.txt #need to create it otherwise check() gonna complain.
 
 remove () {
-    #function made to remove exciding backups.
-    #it will check in each folder (dailly hourly etc) if we excede the max amount.
-    #the amount is in the config file stored in $CONFIG. (constante declared on top)
-    #we gonna loop the CONFIG_ARRAY with the folders names (constante declared on top)
-    for var in ${CONFIG_ARRAY[@]}
+    for VAR in ${!CONFIG_ARRAY[@]}
     do
-	LIMITE=$(grep $var $CONFIG | sed 's/.*=//')
-	FOLDER=$(grep $var $CONFIG | sed 's/=.*//')
+	LIMITE=$(grep $VAR $CONFIG | sed 's/.*=//')
+	FOLDER=$(grep $VAR $CONFIG | sed 's/=.*//')
 	DIRECTORY=$SNAP/$FOLDER
-	COUNT=$(ls $DIRECTORY | wc -l)
+	COUNT=$(ls $DIRECTORY | wc -l)     
 	while [ $COUNT -gt $LIMITE ]
 	do
 	    DELETE=$DIRECTORY/$(ls $DIRECTORY | head -1)
@@ -31,36 +27,63 @@ remove () {
 }
 
 check () {
-    #this function is made to check if we need to make a new backup.
-    #First it checks if $YESDERDAY is not empty.
-    #it will be at the first usage.
-    #if it is not, then we check if yeasterday and today are at least 1 day apart.
-    #if they are we copy as links $YESTERDAY into $TODAY, both inside the $SNAP folder.
-    #at this point we call both create() and remove() functions.
-    #if $YESTERDAY variable is empty (the else part) then we simply call create() function.
+    for VAR in ${!CONFIG_ARRAY[@]}
+    do
+	verification $VAR "${CONFIG_ARRAY[$VAR]}"
+    done
+    remove
+}
 
-    if [ ! -z "$YESTERDAY" ];
-    then
-	if [ $(datediff -i $FORMAT $YESTERDAY $TODAY -f "%d") -ge 1 ];
+verification () {
+    #this function recives 2 arguments.
+    #$1 is the key from CONFIG_ARRAY.
+    #$2 is the value from CONFIG_ARRAY.
+    #the first one is need to create the directory var.
+    #it is also used to get the max snap for ecah directory.
+    #the $2 it is used to tell to datediff what is the limite.
+    #it can be days or hour or week or mounth.
+    DIRECTORY=$SNAP/$1
+    PREVIOUS=$(ls $DIRECTORY | tail -1)
+    LIMITE=$(grep $1 $CONFIG | sed 's/.*=//')
+    if [ $LIMITE -gt 0 ] && [ ! -z $PREVIOUS ] && [ $(datediff -i $FORMAT $PREVIOUS $TODAY -f $2) -ge 1 ]
 	then
-	    cp -al $SNAP/$YESTERDAY $SNAP/$TODAY
-	    create
-	    remove
-	fi
-    else
-	create
+	    create $DIRECTORY $PREVIOUS
+	elif [ $LIMITE -gt 0 ] && [ -z $PREVIOUS ]
+	then
+	    create $DIRECTORY
     fi
-
 }
 
 create () {
-    #this function makes the snapshot.
-    #to do so it uses rsync with the exclude list.
-    #if it a single line function is to give the user possibility to...
-    #... enter the function as parameter to the scritp.
-    rsync -razP --delete --exclude-from=$EXCLUDE $SRC $SNAP/$TODAY
+    #this function might get 2 arguments.
+    #$1 it is the directory.
+    #$2 it is the previous snapshot in that directory.
+    #the second one might not exists if the directory is empty.
+    #this will happen in one of this 2 cases:
+    #1-this is the first time you run the package.
+    #2-you changed your snapshot limite from 0 to anything above that.
 
+    #the function works with 3 conditions:
+    #1-both $1 and $2 exist.
+    # in this case we copy every thing from previous snap into today one and rsync changes into it.
+    #2-the directory exists but it is empty.
+    #in this case we simply create a snapshot from source into today in that directory.
+    #3-no argument are given.
+    #this happens when the user call directly the funciton with --create argument.
+    #in this case we create a snapshot in the custom directory
+    if [ ! -z $1 ] && [ ! -z $2 ]
+    then
+	cp -al $1/$2 $1/$TODAY
+	rsync -razP --delete $SRC $1/$TODAY
+    elif [ ! -z $1 ] && [ -z $2 ]
+    then
+	rsync -razP $SRC $1/$TODAY
+    else
+	rsync -razP $SRC $SNAP/Custom/$TODAY
+    fi
 }
+
+
 
 list () {
     #This function is made to display the snapshots list.
@@ -68,7 +91,7 @@ list () {
     declare -A arrVar=()
 
     #first we fetch each one of the directorie present into $SNAP
-    for directory in $SNAP/{Mounthly,Weekly,Dailly}
+    for directory in $SNAP/{Custom,Mounthly,Weekly,Dailly,Hourly}
     do
 	declare -a tmparr=() #creates or empty the tmp array.
 	#because we empty the array inside the loop it will be fresh for each directory.
@@ -99,8 +122,7 @@ list () {
     #but we add a line number. the $num.
     echo "$num $line"
     #increment $num.
-    ((num=num+1))
-done
+    ((num=num+1));done
 
 }
 
