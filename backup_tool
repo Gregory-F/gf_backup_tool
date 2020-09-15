@@ -74,12 +74,12 @@ create () {
     if [ ! -z $1 ] && [ ! -z $2 ]
     then
 	cp -al $1/$2 $1/$TODAY
-	rsync -razP --delete $SRC $1/$TODAY
+	rsync -razP --delete --exclude-from=$EXCLUDE $SRC $1/$TODAY
     elif [ ! -z $1 ] && [ -z $2 ]
     then
-	rsync -razP $SRC $1/$TODAY
+	sudo rsync -razP $--exclude-from=$EXCLUDE SRC $1/$TODAY
     else
-	rsync -razP $SRC $SNAP/Custom/$TODAY
+	sudo rsync -razP $--exclude-from=$EXCLUDE SRC $SNAP/Custom/$TODAY
     fi
 }
 
