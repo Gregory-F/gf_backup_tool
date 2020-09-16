@@ -5,7 +5,7 @@ SRC=/
 SNAP=/snapshots
 FORMAT="%Y-%m-%d-%H-%M"
 TODAY=$(date +$FORMAT)
-EXCLUDE=/etc/gf_backup_tool/exclude
+EXCLUDE=/etc/gf_backup_tool/exclude_file
 CONFIG=/etc/gf_backup_tool/config
 declare -A CONFIG_ARRAY=([Dailly]="%d" [Weekly]="%w" [Mounthly]="%m" [Hourly]="%H")
 touch /tmp/temp.txt #need to create it otherwise check() gonna complain.
@@ -79,7 +79,7 @@ create () {
     then
 	sudo rsync -razP $--exclude-from=$EXCLUDE SRC $1/$TODAY
     else
-	sudo rsync -razP $--exclude-from=$EXCLUDE SRC $SNAP/Custom/$TODAY
+	sudo rsync -razP --exclude-from=$EXCLUDE $SRC $SNAP/Custom/$TODAY
     fi
 }
 
@@ -138,11 +138,22 @@ echo "$1
 
 }
 
+change_config () {
+    num=$(echo $1 | sed 's/.*=//')
+    target=$(echo $1 | sed 's/=.*//')
+    original=$(sed -n "/$target/s/.*=//p" $CONFIG)
+    sudo sed -i "/$target/s/$original/$num/g" $CONFIG
+    echo "your settings now are: "
+    cat $CONFIG
+}
+
+
 case $@ in
     --help|-h) help "  This is the Backup_tool Help";;
     --list) list;;
     --check) check;;
     --create) create;;
+    --set*) change_config $2;;
     *) help "Error: Invalid Argument '$1' Valid Arguments are:";;
 esac
 
