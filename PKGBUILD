@@ -5,7 +5,7 @@
 
 # Maintainer: Your Name <youremail@domain.com>
 pkgname=gf_backup_tool
-pkgver=6.2.r15.e337237
+pkgver=0.8.r17.fd8ad51
 pkgrel=1
 pkgdesc="Terminal tool for backup based on rsync & systemd"
 arch=('x86_64')
@@ -17,18 +17,17 @@ depends=('systemd'
 	'bash'
 	'sudo'
 )
-makedepends=(git install sudo)
+makedepends=(git sudo)
 checkdepends=()
 backup=()
 source=("git+$url")
-        
 noextract=()
 md5sums=('SKIP')
 validpgpkeys=()
 
 pkgver() {
   cd "${_pkgname}"
-  printf "6.2.r%s.%s" "$(git rev-list --count HEAD)" "$(git rev-parse --short HEAD)"
+  printf "0.8.r%s.%s" "$(git rev-list --count HEAD)" "$(git rev-parse --short HEAD)"
 }
 
 
@@ -56,5 +55,8 @@ package() {
 	sudo install -Dm644 "$srcdir/$pkgname/config" "/etc/gf_backup_tool/config" 
 	sudo install -Dm644 "$srcdir/$pkgname/exclude_file" "/etc/gf_backup_tool/exclude_file"
 	sudo install -Dm645 "$srcdir/$pkgname/backup_tool" "/usr/bin/backup_tool"
+	sudo install -Dm644 "$srcdir/$pkgname/backup.timer" "/etc/systemd/system/backup.timer"
+	sudo install -Dm644 "$srcdir/$pkgname/backup.service" "/etc/systemd/system/backup.service"
+
 }
 
