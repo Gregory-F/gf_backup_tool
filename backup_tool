@@ -10,6 +10,22 @@ CONFIG=/etc/gf_backup_tool/config
 declare -A CONFIG_ARRAY=([Dailly]="%d" [Weekly]="%w" [Mounthly]="%m" [Hourly]="%H")
 touch /tmp/temp.txt #need to create it otherwise check() gonna complain.
 
+init () {
+    #echo "starting systemctl service"
+    #systemctl enable backup.timer
+    #systemctl enable backup.service
+    #systemctl start backup.timer
+    #systemctl start backup.service
+    #systemctl daemon-reload
+    echo
+    echo "starting first backup."
+    create
+    for var in ${!CONFIG_ARRAY[@]}
+    do
+	sudo cp -al $SNAP/Custom/$TODAY $SNAP/$var/$TODAY
+    done
+}
+
 remove () {
     for VAR in ${!CONFIG_ARRAY[@]}
     do
@@ -129,14 +145,22 @@ list () {
 help () {
 echo "$1
 
-	--help -h) Displays this message.
-	--list) displays the full snapshots list
-	--check) checks if you nedd to do a new snapshots according to your preferences
-	--create) will create a new snapshot.
-	--set [option]) sets the amount of snapshots.To set 3 dailly: backup_tool --set Dailly=3 
+	--help -h  Displays this message.
+	--list  displays the full snapshots list
+	--check  checks if you nedd to do a new snapshots according to your preferences
+	--create  will create a new snapshot.
+	--set [option]  sets the amount of snapshots.To set 3 dailly: backup_tool --set Dailly=3 
+	--init initialize the package. To be use only the first time.
+	--show  show settings
 
 	"
 
+}
+
+show_settings () {
+    echo
+    echo "your settings are:"
+    cat $CONFIG
 }
 
 change_config () {
@@ -155,6 +179,8 @@ case $@ in
     --check) check;;
     --create) create;;
     --set*) change_config $2;;
+    --init) init;;
+    --show) show_settings;;
     *) help "Error: Invalid Argument '$1' Valid Arguments are:";;
 esac
 
