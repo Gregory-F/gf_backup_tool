@@ -17,7 +17,7 @@ depends=('systemd'
 	'bash'
 	'sudo'
 )
-makedepends=('git')
+makedepends=(git install sudo)
 checkdepends=()
 backup=()
 source=("git+$url")
