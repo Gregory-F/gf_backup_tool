@@ -1,0 +1,10 @@
+[Unit]
+Description=Starts the backup script every hour on top of the hour.
+
+[Timer]
+Unit=backup.service
+OnCalendar=*-*-* *:00:00
+Persistent=true
+
+[Install]
+WantedBy=timers.target

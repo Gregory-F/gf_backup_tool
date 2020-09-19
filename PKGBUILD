@@ -5,7 +5,7 @@
 
 # Maintainer: Your Name <youremail@domain.com>
 pkgname=gf_backup_tool
-pkgver=0.2.1
+pkgver=6.2.r15.e337237
 pkgrel=1
 pkgdesc="Terminal tool for backup based on rsync & systemd"
 arch=('x86_64')
@@ -26,6 +26,12 @@ noextract=()
 md5sums=('SKIP')
 validpgpkeys=()
 
+pkgver() {
+  cd "${_pkgname}"
+  printf "6.2.r%s.%s" "$(git rev-list --count HEAD)" "$(git rev-parse --short HEAD)"
+}
+
+
 #prepare() {
 #	cd "$pkgname"
 #}
@@ -42,16 +48,13 @@ validpgpkeys=()
 #}
 
 package() {
-    	cd "$pkgdir"
-	sudo mkdir "/etc/gf_backup_tool"
 	for var in {Custom,Hourly,Dailly,Weekly,Mounthly}
 	do
 	    sudo mkdir -p /snapshots/$var
-	    done
-	sudo cp "$srcdir/$pkgname/config" "/etc/gf_backup_tool/config" 
-	sudo cp "$srcdir/$pkgname/exclude_file" "/etc/gf_backup_tool/exclude_file"
-	sudo cp "$srcdir/$pkgname/backup_tool" "/usr/bin/backup_tool"
-	sudo chmod +x "/usr/bin/backup_tool"
-	#make DESTDIR="$pkgdir/" install
+        done
+	#make PREFIX=/usr DESTDIR="$pkgdir/" install
+	sudo install -Dm644 "$srcdir/$pkgname/config" "/etc/gf_backup_tool/config" 
+	sudo install -Dm644 "$srcdir/$pkgname/exclude_file" "/etc/gf_backup_tool/exclude_file"
+	sudo install -Dm645 "$srcdir/$pkgname/backup_tool" "/usr/bin/backup_tool"
 }
 
