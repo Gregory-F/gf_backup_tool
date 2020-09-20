@@ -5,7 +5,7 @@
 
 # Maintainer: Your Name <youremail@domain.com>
 pkgname=gf_backup_tool
-pkgver=0.8.r17.fd8ad51
+pkgver=0.8.r19.a64c722
 pkgrel=1
 pkgdesc="Terminal tool for backup based on rsync & systemd"
 arch=('x86_64')
@@ -49,14 +49,14 @@ pkgver() {
 package() {
 	for var in {Custom,Hourly,Dailly,Weekly,Mounthly}
 	do
-	    sudo mkdir -p /snapshots/$var
+	    mkdir -p $pkgdir/snapshots/$var
         done
-	#make PREFIX=/usr DESTDIR="$pkgdir/" install
-	sudo install -Dm644 "$srcdir/$pkgname/config" "/etc/gf_backup_tool/config" 
-	sudo install -Dm644 "$srcdir/$pkgname/exclude_file" "/etc/gf_backup_tool/exclude_file"
-	sudo install -Dm645 "$srcdir/$pkgname/backup_tool" "/usr/bin/backup_tool"
-	sudo install -Dm644 "$srcdir/$pkgname/backup.timer" "/etc/systemd/system/backup.timer"
-	sudo install -Dm644 "$srcdir/$pkgname/backup.service" "/etc/systemd/system/backup.service"
+	install -Dm644 "$srcdir/$pkgname/config" "$pkgdir/etc/gf_backup_tool/config" 
+	install -Dm644 "$srcdir/$pkgname/exclude_file" "$pkgdir/etc/gf_backup_tool/exclude_file"
+	install -Dm645 "$srcdir/$pkgname/backup_tool" "$pkgdir/usr/bin/backup_tool"
+	install -Dm644 "$srcdir/$pkgname/backup.timer" "$pkgdir/etc/systemd/system/backup.timer"
+	install -Dm644 "$srcdir/$pkgname/backup.service" "$pkgdir/etc/systemd/system/backup.service"
+	#make DESTDIR="$pkgdir/" install
 
 }
 
