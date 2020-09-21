@@ -7,7 +7,7 @@
 pkgname=gf_backup_tool
 pkgver=0.8.r19.a64c722
 pkgrel=1
-pkgdesc="Terminal tool for backup based on rsync & systemd"
+pkgdesc="Backup Terminal tool based on rsync & systemd"
 arch=('x86_64')
 url="https://github.com/Gregory-F/gf_backup_tool"
 license=('GPL')
@@ -51,12 +51,12 @@ package() {
 	do
 	    mkdir -p $pkgdir/snapshots/$var
         done
-	install -Dm644 "$srcdir/$pkgname/config" "$pkgdir/etc/gf_backup_tool/config" 
-	install -Dm644 "$srcdir/$pkgname/exclude_file" "$pkgdir/etc/gf_backup_tool/exclude_file"
-	install -Dm645 "$srcdir/$pkgname/backup_tool" "$pkgdir/usr/bin/backup_tool"
-	install -Dm644 "$srcdir/$pkgname/backup.timer" "$pkgdir/etc/systemd/system/backup.timer"
-	install -Dm644 "$srcdir/$pkgname/backup.service" "$pkgdir/etc/systemd/system/backup.service"
-	#make DESTDIR="$pkgdir/" install
+	#make PREFIX=/usr DESTDIR="$pkgdir/" install
+	install -Dm 644 "$srcdir/$pkgname/config" "$pkgdir/etc/gf_backup_tool/config" 
+	install -Dm 644 "$srcdir/$pkgname/exclude_file" "$pkgdir/etc/gf_backup_tool/exclude_file"
+	install -Dm 645 "$srcdir/$pkgname/backup_tool" "$pkgdir/usr/bin/backup_tool"
+	install -Dm 644 "$srcdir/$pkgname/gf_backup_tool.timer" "$pkgdir/etc/systemd/system/gf_backup_tool.timer"
+	install -Dm 644 "$srcdir/$pkgname/gf_backup_tool.service" "$pkgdir/etc/systemd/system/gf_backup_tool.service"
 
 }
 
