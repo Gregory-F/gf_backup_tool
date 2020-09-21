@@ -155,13 +155,24 @@ show_settings () {
 }
 
 change_config () {
-    for arg in $@
-    do
-	num=$(echo $arg | sed 's/.*=//')
-	target=$(echo $arg | sed 's/=.*//')
-	original=$(sed -n "/$target/s/.*=//p" $CONFIG)
-	sed -i "/$target/s/$original/$num/g" $CONFIG
-    done
+    if [ "$1" != "change_config" ]
+    then
+	for arg in $@
+	do
+	    num=$(echo $arg | sed 's/.*=//')
+	    target=$(echo $arg | sed 's/=.*//')
+	    original=$(sed -n "/$target/s/.*=//p" $CONFIG)
+	    sed -i "/$target/s/$original/$num/g" $CONFIG
+	done
+    else
+	for arg in $2 $3 $4 $5
+	do
+	    num=$(echo $arg | sed 's/.*=//')
+	    target=$(echo $arg | sed 's/=.*//')
+	    original=$(sed -n "/$target/s/.*=//p" $CONFIG)
+	    sed -i "/$target/s/$original/$num/g" $CONFIG
+	done
+    fi
     echo "your settings now are: "
     cat $CONFIG
 }
