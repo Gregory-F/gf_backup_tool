@@ -12,7 +12,6 @@ touch /tmp/temp.txt #need to create it otherwise check() gonna complain.
 
 init () {
     show_settings
-    set
     read -r -p "do you want to edite them? [y/N]" answer
     case $answer in
 	[y]) echo 'enter your settings.ie: Dailly=3 Hourly=1 Weekly=0.';
