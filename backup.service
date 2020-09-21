@@ -1,6 +1,0 @@
-[Unit]
-Description=This sevice is made to run the backup_tool with --check argument
-
-[Service]
-Type=simple
-ExecStart=/bin/bash /usr/bin/backup_tool --check
