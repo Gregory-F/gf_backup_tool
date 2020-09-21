@@ -16,7 +16,7 @@ init () {
     case $answer in
 	[y]) echo 'enter your settings.ie: Dailly=3 Hourly=1 Weekly=0.';
 	    read -p 'NOTICE: no quotes and first letter in cap: ' var1 var2 var3 var4;
-	    change_config var1 var2 var3 var4;;
+	    change_config $var1 $var2 $var3 $var4;;
 	*) echo "No changes made.";
 	    echo "you can change them later with sudo backup_tool --set [option]"
     esac
