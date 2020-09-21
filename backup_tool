@@ -11,7 +11,7 @@ declare -A CONFIG_ARRAY=([Dailly]="%d" [Weekly]="%w" [Mounthly]="%m" [Hourly]="%
 touch /tmp/temp.txt #need to create it otherwise check() gonna complain.
 
 init () {
-    show
+    show_settings
     set
     read -r -p "do you want to edite them? [y/N]" answer
     case $answer in
