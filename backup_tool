@@ -11,19 +11,22 @@ declare -A CONFIG_ARRAY=([Dailly]="%d" [Weekly]="%w" [Mounthly]="%m" [Hourly]="%
 touch /tmp/temp.txt #need to create it otherwise check() gonna complain.
 
 init () {
+    show
+    set
+    read -r -p "do you want to edite them? [y/N]" answer
+    case $answer in
+	[y]) echo "ok";;
+	*) echo "no";;
+    esac
     #echo "starting systemctl service"
-    #systemctl enable backup.timer
-    #systemctl enable backup.service
-    #systemctl start backup.timer
-    #systemctl start backup.service
-    #systemctl daemon-reload
-    echo
-    echo "starting first backup."
-    create
-    for var in ${!CONFIG_ARRAY[@]}
-    do
-	sudo cp -al $SNAP/Custom/$TODAY $SNAP/$var/$TODAY
-    done
+    #systemctl enable --now gf_backup_tool.timer
+    #echo
+    #echo "starting first backup."
+    #create
+    #for var in ${!CONFIG_ARRAY[@]}
+    #do
+#	sudo cp -al $SNAP/Custom/$TODAY $SNAP/$var/$TODAY
+    #done
 }
 
 remove () {
@@ -142,20 +145,6 @@ list () {
 
 }
 
-help () {
-echo "$1
-
-	--help -h  Displays this message.
-	--list  displays the full snapshots list
-	--check  checks if you nedd to do a new snapshots according to your preferences
-	--create  will create a new snapshot.
-	--set [option]  sets the amount of snapshots.To set 3 dailly: backup_tool --set Dailly=3 
-	--init initialize the package. To be use only the first time.
-	--show  show settings
-
-	"
-
-}
 
 show_settings () {
     echo
@@ -164,12 +153,32 @@ show_settings () {
 }
 
 change_config () {
-    num=$(echo $1 | sed 's/.*=//')
-    target=$(echo $1 | sed 's/=.*//')
-    original=$(sed -n "/$target/s/.*=//p" $CONFIG)
-    sudo sed -i "/$target/s/$original/$num/g" $CONFIG
+    for arg in $2 $3 $4 $5
+    do
+	num=$(echo $arg | sed 's/.*=//')
+	target=$(echo $arg | sed 's/=.*//')
+	original=$(sed -n "/$target/s/.*=//p" $CONFIG)
+	sed -i "/$target/s/$original/$num/g" $CONFIG
+    done
     echo "your settings now are: "
     cat $CONFIG
+}
+
+
+help () {
+echo "$1
+
+	--help -h  Displays this message.
+	--list  displays the full snapshots list and exit.
+	--check  checks if you nedd to do a new snapshots according to your preferences.
+	--create  will create a new snapshot and store it under Custom.Only manual delete.
+	--set [option]  sets the amount of snapshots.To set 3 dailly:sudo backup_tool --set Dailly=3 
+					to set 3 dailly and 1 weekly:sudo backup_too --set Dailly=3 Weekly=1
+	--init initialize the package. To be use only the first time.
+	--show  show settings and exit.
+
+	"
+
 }
 
 
@@ -178,7 +187,7 @@ case $@ in
     --list) list;;
     --check) check;;
     --create) create;;
-    --set*) change_config $2;;
+    --set*) change_config $@;;
     --init) init;;
     --show) show_settings;;
     *) help "Error: Invalid Argument '$1' Valid Arguments are:";;
