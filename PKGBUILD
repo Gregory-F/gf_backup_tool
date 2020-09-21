@@ -17,6 +17,7 @@ depends=('systemd'
 	'bash'
 	'sudo'
 )
+install=gf_backup_tool.install
 makedepends=(git sudo)
 checkdepends=()
 backup=()
