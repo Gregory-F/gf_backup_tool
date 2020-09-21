@@ -2,7 +2,7 @@
 Description=Starts the backup script every hour on top of the hour.
 
 [Timer]
-Unit=backup.service
+Unit=gf_backup_tool.service
 OnCalendar=*-*-* *:00:00
 Persistent=true
 
