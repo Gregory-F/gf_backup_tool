@@ -20,15 +20,16 @@ init () {
 	*) echo "No changes made.";
 	    echo "you can change them later with sudo backup_tool --set [option]"
     esac
-    #echo "starting systemctl service"
-    #systemctl enable --now gf_backup_tool.timer
-    #echo
-    #echo "starting first backup."
-    #create
-    #for var in ${!CONFIG_ARRAY[@]}
-    #do
-#	sudo cp -al $SNAP/Custom/$TODAY $SNAP/$var/$TODAY
-    #done
+    echo
+    echo "starting first backup."
+    create
+    for var in ${!CONFIG_ARRAY[@]}
+    do
+	sudo cp -al $SNAP/Custom/$TODAY $SNAP/$var/$TODAY
+    done
+    echo
+    echo "starting systemctl service"
+    systemctl enable --now gf_backup_tool.timer
 }
 
 remove () {
@@ -155,9 +156,9 @@ show_settings () {
 }
 
 change_config () {
-    if [ "$1" != "change_config" ]
+    if [ "$1" != "--set" ]
     then
-	for arg in $@
+	for arg in $2 $3 $4 $5
 	do
 	    num=$(echo $arg | sed 's/.*=//')
 	    target=$(echo $arg | sed 's/=.*//')
