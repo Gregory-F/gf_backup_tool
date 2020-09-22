@@ -5,7 +5,7 @@
 
 # Maintainer: Your Name <youremail@domain.com>
 pkgname=gf_backup_tool
-pkgver=0.8.r36.5cc679d
+pkgver=v0.9.1.r0.g5cc679d
 pkgrel=1
 pkgdesc="Backup Terminal tool based on rsync & systemd"
 arch=('x86_64')
@@ -20,7 +20,8 @@ depends=('systemd'
 install=gf_backup_tool.install
 makedepends=(git sudo)
 checkdepends=()
-backup=()
+backup=('etc/gf_backup_tool/config'
+	'etc/gf_backup_tool/exclude_file')
 source=("git+$url")
 noextract=()
 md5sums=('SKIP')
