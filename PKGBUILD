@@ -5,7 +5,7 @@
 
 # Maintainer: Your Name <youremail@domain.com>
 pkgname=gf_backup_tool
-pkgver=0.8.r19.a64c722
+pkgver=0.8.r36.5cc679d
 pkgrel=1
 pkgdesc="Backup Terminal tool based on rsync & systemd"
 arch=('x86_64')
@@ -28,7 +28,7 @@ validpgpkeys=()
 
 pkgver() {
   cd "${_pkgname}"
-  printf "0.8.r%s.%s" "$(git rev-list --count HEAD)" "$(git rev-parse --short HEAD)"
+  git describe --long --tags | sed 's/\([^-]*-g\)/r\1/;s/-/./g'
 }
 
 
