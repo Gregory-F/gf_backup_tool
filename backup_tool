@@ -180,6 +180,14 @@ change_config () {
 
 delete () {
     list
+    declare -A folder_array=([D]="Dailly" [W]="Weekly" [M]="Mounthly" [C]="Custom" [H]="Hourly")
+    read -p "enter snapshot number to delete. Unvalide entry to cancel. " num
+    entry=$(sed "$num q;d" /tmp/temp1.txt)
+    snapshot=$(echo $entry | sed 's/ .*//')
+    folder=$(echo $entry | sed 's/.* //')
+    echo "now Deleting $SNAP/${folder_array[$folder]}/$snapshot"
+
+    rm -rf "$SNAP/${folder_array[$folder]}/$snapshot"
 }
 
 help () {
