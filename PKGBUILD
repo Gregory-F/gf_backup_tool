@@ -5,7 +5,7 @@
 
 # Maintainer: Your Name <youremail@domain.com>
 pkgname=gf_backup_tool
-pkgver=0.8.r19.a64c722
+pkgver=v0.9.1.r3.g60979e3
 pkgrel=1
 pkgdesc="Backup Terminal tool based on rsync & systemd"
 arch=('x86_64')
@@ -20,7 +20,8 @@ depends=('systemd'
 install=gf_backup_tool.install
 makedepends=(git sudo)
 checkdepends=()
-backup=()
+backup=('etc/gf_backup_tool/config'
+	'etc/gf_backup_tool/exclude_file')
 source=("git+$url")
 noextract=()
 md5sums=('SKIP')
@@ -28,7 +29,7 @@ validpgpkeys=()
 
 pkgver() {
   cd "${_pkgname}"
-  printf "0.8.r%s.%s" "$(git rev-list --count HEAD)" "$(git rev-parse --short HEAD)"
+  git describe --long --tags | sed 's/\([^-]*-g\)/r\1/;s/-/./g'
 }
 
 

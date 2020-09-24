@@ -178,6 +178,17 @@ change_config () {
     cat $CONFIG
 }
 
+delete () {
+    list
+    declare -A folder_array=([D]="Dailly" [W]="Weekly" [M]="Mounthly" [C]="Custom" [H]="Hourly")
+    read -p "enter snapshot number to delete. Unvalide entry to cancel. " num
+    entry=$(sed "$num q;d" /tmp/temp1.txt)
+    snapshot=$(echo $entry | sed 's/ .*//')
+    folder=$(echo $entry | sed 's/.* //')
+    echo "now Deleting $SNAP/${folder_array[$folder]}/$snapshot"
+
+    rm -rf "$SNAP/${folder_array[$folder]}/$snapshot"
+}
 
 help () {
 echo "$1
@@ -190,6 +201,7 @@ echo "$1
 					to set 3 dailly and 1 weekly:sudo backup_too --set Dailly=3 Weekly=1
 	--init initialize the package. To be use only the first time.
 	--show  show settings and exit.
+	--delete  lists every snapshots and give you the option to delete any of them.
 
 	"
 
@@ -204,6 +216,7 @@ case $@ in
     --set*) change_config $@;;
     --init) init;;
     --show) show_settings;;
+    --delete) delete;;
     *) help "Error: Invalid Argument '$1' Valid Arguments are:";;
 esac
 
