@@ -180,14 +180,28 @@ change_config () {
 
 delete () {
     list
+    limite=$(cat /tmp/temp1.txt | wc -l)
     declare -A folder_array=([D]="Dailly" [W]="Weekly" [M]="Mounthly" [C]="Custom" [H]="Hourly")
-    read -p "enter snapshot number to delete. Unvalide entry to cancel. " num
-    entry=$(sed "$num q;d" /tmp/temp1.txt)
-    snapshot=$(echo $entry | sed 's/ .*//')
-    folder=$(echo $entry | sed 's/.* //')
-    echo "now Deleting $SNAP/${folder_array[$folder]}/$snapshot"
-
-    rm -rf "$SNAP/${folder_array[$folder]}/$snapshot"
+    read -p "enter snapshot number to delete. Enter 0 to exit. " num
+    case $num in
+	0) echo "exiting"
+	    exit 1;;
+	''|*[!0-9]*) echo "ERROR: '$num' is not a valid number from the list.";
+	    echo "EXITING"
+	    exit ;;
+	*) if [ $num -gt $limite ] || [ $num -lt 0 ]; then
+	    echo "INVALIDE ENTRY:"
+	    echo "must be a number between 1 and $limite"
+	    echo "exiting"
+	    exit 1
+	fi
+	    entry=$(sed "$num q;d" /tmp/temp1.txt)
+	    snapshot=$(echo $entry | sed 's/ .*//')
+	    folder=$(echo $entry | sed 's/.* //')
+	    echo "now Deleting $SNAP/${folder_array[$folder]}/$snapshot"
+	    rm -rf "$SNAP/${folder_array[$folder]}/$snapshot"
+	    ;;
+    esac
 }
 
 help () {
