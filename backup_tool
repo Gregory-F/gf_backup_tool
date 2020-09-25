@@ -50,10 +50,10 @@ full_init() {
 		sudo cp -al $SNAP/Custom/$TODAY $SNAP/$var/$TODAY
 		echo "starting systemctl service"
 		systemctl enable --now gf_backup_tool.timer
-		echo "Every hour we will check if a new snapshot is required according to your settings"
+		echo "Now every hour we will check automaticly if a new snapshot is required according to your settings"
 		echo "Done."
 	    done
-	    exit;;
+	    exit
 }
 
 remove () {
@@ -202,14 +202,15 @@ change_config () {
     cat $CONFIG
 }
 
-delete () {
+
+restore () {
     list
     limite=$(cat /tmp/temp1.txt | wc -l)
     declare -A folder_array=([D]="Dailly" [W]="Weekly" [M]="Mounthly" [C]="Custom" [H]="Hourly")
-    read -p "enter snapshot number to delete. Enter 0 to exit. " num
+    read -p "enter snapshot number to restore. Enter 0 to exit. " num
     case $num in
 	0) echo "exiting"
-	    exit 1;;
+	    exit;;
 	''|*[!0-9]*) echo "ERROR: '$num' is not a valid number from the list.";
 	    echo "EXITING"
 	    exit ;;
@@ -217,7 +218,47 @@ delete () {
 	    echo "INVALIDE ENTRY:"
 	    echo "must be a number between 1 and $limite"
 	    echo "exiting"
-	    exit 1
+	    exit 
+	fi
+	    entry=$(sed "$num q;d" /tmp/temp1.txt)
+	    snapshot=$(echo $entry | sed 's/ .*//')
+	    folder=$(echo $entry | sed 's/.* //')
+	    echo "we will restore $snapshot"
+	    echo "after that we will automaticly reboot"
+	    echo "WARNING: this software comes with no garanties, procede at your own riscks."
+	    read -r -p "do you want to continue? [Y/n] " asnwer
+	    if [ -z $answer ] || [ $answer == "Y" ] || [ a$answer == "y" ]; then
+		echo "now restaoring $SNAP/${folder_array[$folder]}/$snapshot"
+		rsync -razPv --exclude-from="$EXCLUDE" "$SNAP/${folder_array[$folder]}/$snapshot" "$SRC"
+		sudo reboot
+	    elif [ $answer == "n" ] || [ $answer == "N" ]; then
+		echo "Aborting"
+		exit
+	    else
+		echo "ERROR '$answer' is not a valid answer."
+		echo "EXITING"
+	    fi
+	    ;;
+    esac
+}
+
+
+delete () {
+    list
+    limite=$(cat /tmp/temp1.txt | wc -l)
+    declare -A folder_array=([D]="Dailly" [W]="Weekly" [M]="Mounthly" [C]="Custom" [H]="Hourly")
+    read -p "enter snapshot number to delete. Enter 0 to exit. " num
+    case $num in
+	0) echo "exiting"
+	    exit ;;
+	''|*[!0-9]*) echo "ERROR: '$num' is not a valid number from the list.";
+	    echo "EXITING"
+	    exit ;;
+	*) if [ $num -gt $limite ] || [ $num -lt 0 ]; then
+	    echo "INVALIDE ENTRY:"
+	    echo "must be a number between 1 and $limite"
+	    echo "EXITING"
+	    exit 
 	fi
 	    entry=$(sed "$num q;d" /tmp/temp1.txt)
 	    snapshot=$(echo $entry | sed 's/ .*//')
@@ -240,6 +281,7 @@ echo "$1
 	--init initialize the package. To be use only the first time.
 	--show  show settings and exit.
 	--delete  lists every snapshots and give you the option to delete any of them.
+	--restore  Show snapshots list and restore the selected one by the user.
 
 	"
 
@@ -255,6 +297,7 @@ case $@ in
     --init) init;;
     --show) show_settings;;
     --delete) delete;;
+    --restore) restore;;
     *) help "Error: Invalid Argument '$1' Valid Arguments are:";;
 esac
 
