@@ -33,7 +33,16 @@ init () {
 	    echo "Every hour we will check if a new snapshot is required according to your settings"
 	    echo "Done."
 	    exit;;
-	*)echo 
+	[yY])echo 
+	    full_init;;
+	"")echo
+	    full_init;;
+	*)echo "ERROR: unvalide entry '$answer'"
+    esac
+    echo
+}
+
+full_init() {
 	    echo "creating original snapshot."
 	    create
 	    for var in ${!CONFIG_ARRAY[@]}
@@ -45,8 +54,6 @@ init () {
 		echo "Done."
 	    done
 	    exit;;
-    esac
-    echo
 }
 
 remove () {
