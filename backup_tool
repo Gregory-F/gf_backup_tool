@@ -229,7 +229,7 @@ restore () {
 	    read -r -p "do you want to continue? [Y/n] " asnwer
 	    if [ -z $answer ] || [ $answer == "Y" ] || [ a$answer == "y" ]; then
 		echo "now restaoring $SNAP/${folder_array[$folder]}/$snapshot"
-		rsync -razPv --exclude-from="$EXCLUDE" "$SNAP/${folder_array[$folder]}/$snapshot" "$SRC"
+		rsync -razPv --exclude-from="$EXCLUDE" "$SNAP/${folder_array[$folder]}/$snapshot/" "$SRC"
 		sudo reboot
 	    elif [ $answer == "n" ] || [ $answer == "N" ]; then
 		echo "Aborting"
