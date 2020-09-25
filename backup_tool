@@ -14,22 +14,39 @@ init () {
     show_settings
     read -r -p "do you want to edite them? [y/N]" answer
     case $answer in
-	[y]) echo 'enter your settings.ie: Dailly=3 Hourly=1 Weekly=0.';
+	[yY]) echo 'enter your settings.ie: Dailly=3 Hourly=1 Weekly=0.';
 	    read -p 'NOTICE: no quotes and first letter in cap: ' var1 var2 var3 var4;
 	    change_config $0 $var1 $var2 $var3 $var4;;
 	*) echo "No changes made.";
 	    echo "you can change them later with sudo backup_tool --set [option]"
     esac
     echo
-    echo "starting first backup."
-    create
-    for var in ${!CONFIG_ARRAY[@]}
-    do
-	sudo cp -al $SNAP/Custom/$TODAY $SNAP/$var/$TODAY
-    done
+    echo "We can do your first Backup."
+    echo "It will be save as custom (C tag)"
+    echo "if you decide not to, then we will make only according to your settings"
+    echo "in the Dailly,Weekly,Mounthly,Hourly folders"
+    echo "NOTICE: you can create your own snapshot at any time with: sudo backup_tool --create"
+    read -r -p "Do you want to create an original snapshot now? [Y/n] " answer
+    case $answer in
+	[nN]) echo "starting systemctl service"
+	    systemctl enable --now gf_backup_tool.timer
+	    echo "Every hour we will check if a new snapshot is required according to your settings"
+	    echo "Done."
+	    exit;;
+	*)echo 
+	    echo "creating original snapshot."
+	    create
+	    for var in ${!CONFIG_ARRAY[@]}
+	    do
+		sudo cp -al $SNAP/Custom/$TODAY $SNAP/$var/$TODAY
+		echo "starting systemctl service"
+		systemctl enable --now gf_backup_tool.timer
+		echo "Every hour we will check if a new snapshot is required according to your settings"
+		echo "Done."
+	    done
+	    exit;;
+    esac
     echo
-    echo "starting systemctl service"
-    systemctl enable --now gf_backup_tool.timer
 }
 
 remove () {
