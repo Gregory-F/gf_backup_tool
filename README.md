@@ -71,3 +71,7 @@ will create a snapshot with the custom (C) flag.
 sudo backup_tool --restore
 ```
 will prompt the snapshots list (with tags) and let the user choice one to restore from.
+
+
+## licence
+[GPL](https://www.gnu.org/licenses/why-not-lgpl.html)
