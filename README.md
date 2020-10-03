@@ -6,7 +6,7 @@ It is made to do incremental backups to save space.
 ## installation
 
 ```bash
-yay backup_tool
+yay gf_backup_tool
 ```
 
 ## usage  
