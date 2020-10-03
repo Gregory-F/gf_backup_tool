@@ -4,7 +4,7 @@
 # then please put 'unknown'.
 
 # Maintainer: Your Name <youremail@domain.com>
-pkgname=gf_backup_tool
+pkgname=gf_backup_tool-git
 pkgver=v1.0.9.gd1c3dee
 pkgrel=1
 pkgdesc="Backup Terminal tool based on rsync & systemd"
