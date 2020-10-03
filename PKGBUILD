@@ -5,11 +5,7 @@
 
 # Maintainer: Your Name <youremail@domain.com>
 pkgname=gf_backup_tool
-<<<<<<< HEAD
 pkgver=v1.0.1.g1fd2bea
-=======
-pkgver=v1.0.r0.g295b985
->>>>>>> devel
 pkgrel=1
 pkgdesc="Backup Terminal tool based on rsync & systemd"
 arch=('x86_64')
