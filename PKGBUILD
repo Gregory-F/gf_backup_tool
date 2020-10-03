@@ -28,7 +28,7 @@ validpgpkeys=()
 
 pkgver() {
   cd "${_pkgname}"
-  git describe --long --tags | sed 's/\([^-]*-g\)/\1/;s/-/./g'
+  date +%Y%m%d
 }
 
 
