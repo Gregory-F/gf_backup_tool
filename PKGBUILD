@@ -1,9 +1,4 @@
-# This is an example PKGBUILD file. Use this as a start to creating your own,
-# and remove these comments. For more information, see 'man PKGBUILD'.
-# NOTE: Please fill out the license field for your package! If it is unknown,
-# then please put 'unknown'.
-
-# Maintainer: Your Name <youremail@domain.com>
+# Maintainer: Gregory-F <guegre1979@netcourrier.com>
 pkgname=gf_backup_tool-git
 pkgver=20201003
 pkgrel=1
@@ -17,7 +12,7 @@ depends=('systemd'
 	'bash'
 	)
 install=gf_backup_tool.install
-makedepends=(git sudo)
+makedepends=(git)
 checkdepends=()
 backup=('etc/gf_backup_tool/config'
 	'etc/gf_backup_tool/exclude_file')
